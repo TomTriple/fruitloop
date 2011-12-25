@@ -1,32 +1,33 @@
-class TIdentifier
+class Token; end; 
+
+class TIdentifier < Token
   attr_accessor :name
   def initialize(name)
     @name = name
   end
 end
 
-class TNumber
+class TNumber  < Token
   attr_accessor :number 
   def initialize(number)
     @number = number
   end
 end
 
-class TBinOp
+class TBinOp < Token
   attr_accessor :op
   def initialize(op)
     @op = op
   end
 end
 
-class TColon; end;
-class TEq; end;
-class TTerminate; end;
-class TEnd; end;
-class TLoop; end;
-class TDo; end;
-
-
+class TColon < Token; end;
+class TEq < Token; end;
+class TTerminate < Token; end;
+class TEnd < Token; end;
+class TLoop < Token; end;
+class TDo < Token; end;
+class TSemicolon < Token; end;
 
 
 class Lexer
@@ -80,9 +81,10 @@ class Lexer
       # TNumber
       if @c =~ /[0-9]/
         @token_name = @c
-        while (@c = next_char) =~ /0-9/
+        while (@c = next_char) =~ /[0-9]/
           @token_name += @c
         end
+        @pos -= 1
         return TNumber.new(@token_name)
       end
 
@@ -91,13 +93,16 @@ class Lexer
         return TBinOp.new(@c)
       end
 
+      # TSemicolon 
+      if @c == ";"
+        return TSemicolon.new
+      end
+
       # TEnd 
       if @c == "@"
         @input_finished = true
         return TTerminate.new
-      end
-
-
+      end 
     end
   end
 
@@ -107,7 +112,6 @@ class Lexer
   def whitespace?
     @c == "\t" or @c == "\n" or @c == "\r" or @c == " "
   end
-
 
 
   def read_input(file)
