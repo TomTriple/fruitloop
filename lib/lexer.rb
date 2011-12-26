@@ -47,17 +47,19 @@ class Lexer
   end
 
 
-  def input_token 
+  def input_token
+
     @token_name = ""
     while (@c = next_char) && @input_finished.nil? 
       next if whitespace?
 
       # TIdentifer + Keywords
-      if @c =~ /[a-zA-Z]/
+      if @c =~ /[a-z]/
         @token_name = @c
-        while (@c = next_char) =~ /[a-zA-Z]/
+        while (@c = next_char) =~ /[a-z]/
           @token_name += @c
         end
+        @pos -= 1
         if @token_name == "loop"
           return TLoop.new
         elsif @token_name == "do"
@@ -69,15 +71,6 @@ class Lexer
         end
       end
 
-      # TColon
-      if @c == ":"
-        return TColon.new
-      end
-
-      if @c == "="
-        return TEq.new
-      end
-
       # TNumber
       if @c =~ /[0-9]/
         @token_name = @c
@@ -86,6 +79,16 @@ class Lexer
         end
         @pos -= 1
         return TNumber.new(@token_name)
+      end
+
+      # TColon
+      if @c == ":"
+        return TColon.new
+      end
+
+      # TEq
+      if @c == "="
+        return TEq.new
       end
 
       # TBinOp

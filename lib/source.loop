@@ -1,5 +1,1 @@
-xb := null + 2
-xc := null + 3
-loop xb do
-  xa := xc + 1
-end
+xa := nothing - 457676
