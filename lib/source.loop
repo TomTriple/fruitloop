@@ -1,17 +1,5 @@
-xa := xb + 23;
-xa := xb + 23;
-loop xa do
-    xa := xb + 23;
-    loop xa do
-        xa := xb + 23;
-        xa := xb + 23
-    end; 
-    loop xa do
-        loop xa do
-            loop xa do
-                xa := xb + 23;
-                xa := xb + 23
-            end
-        end
-    end
+xb := null + 2;
+xc := null + 3;
+loop xc do
+    xa := xb + 1
 end

@@ -1,4 +1,3 @@
-=begin
 class Node
   @@target = ""
 
@@ -9,35 +8,37 @@ end
 
 
 class NodeStart < Node
-  attr_accessor :programs
-  def gen
-    translate("(function() {")
-    programs.each do |prog|
-      prog.gen
-    end
-    translate("})()")
+  attr_accessor :children
+
+  def accept(visitor)
+    visitor.visitStart self
   end
 end
 
 
 class NodeAssignment < Node
-  attr_accessor :lvalue, :op1, :op, :op2
-  def gen
-    translate("var #{lvalue.name} = #{op1} #{op} #{op2}")
+  attr_accessor :lvalue, :rvalue
+
+  def accept(visitor)
+    visitor.visitAssignment self
   end
 end
 
 
 class NodeLoop < Node
-  attr_accessor :to, :body
-  def gen
-    translate("for(var i = 0; i < #{to.number}; i++) {")
+  attr_accessor :to, :children
 
-    translate("}")
+  def accept(visitor)
+    visitor.visitLoop self 
   end
 end
 
-=end 
+
+
+
+
+
+
 
 
 class Parser
@@ -75,7 +76,7 @@ class Parser
     else
       raise parse_error
     end
-    # epsilon-prod wird von p behandelt 
+    # 
     input_token
     if token.is_a?TSemicolon
       parse_x
