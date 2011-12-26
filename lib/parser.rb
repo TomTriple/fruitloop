@@ -55,36 +55,35 @@ class Parser
   end
 
   def parse_start
-    test_tokens
-    exit
+    #test_tokens
+    #exit
 
     parse_p
-    token.is_a? TTerminate
+    raise parse_error unless token.is_a?TTerminate 
 
   end
 
   def parse_p
     input_token
-    if token.is_a? TIdentifier
+    if token.is_a?TIdentifier
       parse_a
-      parse_x
-    elsif token.is_a? TLoop
+    elsif token.is_a?TLoop
       match TIdentifier
       match TDo
       parse_p
-      token.is_a? TEnd
+      raise parse_error unless token.is_a?TEnd 
+    else
+      raise parse_error
+    end
+    # epsilon-prod wird von p behandelt 
+    input_token
+    if token.is_a?TSemicolon
       parse_x
     end
   end
 
   def parse_x
-    input_token
-    if token.is_a? TSemicolon
-      parse_p
-      parse_x
-    else
-
-    end
+    parse_p
   end
 
   def parse_a
@@ -120,6 +119,10 @@ class Parser
 
   def input_token
     @token = @lexer.input_token 
+  end
+
+  def parse_error
+    "Syntaxfehler, Token is: #{@token.class}."
   end
 
 

@@ -1,1 +1,17 @@
-xa := nothing - 457676
+xa := xb + 23;
+xa := xb + 23;
+loop xa do
+    xa := xb + 23;
+    loop xa do
+        xa := xb + 23;
+        xa := xb + 23
+    end; 
+    loop xa do
+        loop xa do
+            loop xa do
+                xa := xb + 23;
+                xa := xb + 23
+            end
+        end
+    end
+end
