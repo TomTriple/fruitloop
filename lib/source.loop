@@ -1,5 +1,15 @@
-xb := null + 2;
-xc := null + 3;
+nine := ten - 1;
+xa := empty + 0;
+xb := empty + 6;
+xc := empty + 3;
+xtemp := empty + 0; 
+
+
 loop xc do
-    xa := xb + 1
+    xtemp := xb + 1
+end;
+loop ten do
+    loop xtemp do
+        xa := empty + 1
+    end
 end
