@@ -13,6 +13,4 @@ class SymbolTable
 
   def self.identifiers; @@identifiers; end; 
 
-
-
 end

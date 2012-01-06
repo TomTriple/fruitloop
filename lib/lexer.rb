@@ -3,9 +3,9 @@ require "token/all"
 
 class Lexer
 
-  def initialize
+  def initialize 
     @source = ""
-    read_input("source.loop")
+    read_input(ARGV.first)
     @pos = -1
   end
 

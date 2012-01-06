@@ -21,16 +21,13 @@ class Parser
   end
 
   def parse_start
-    #test_tokens
-    #exit
+   # test_tokens
+   # exit
 
     @node_start = NodeStart.new
     parse_p(@node_start)
     raise parse_error unless token.is_a?TTerminate
-
-    visitor = JSVisitor.new
-    @node_start.accept visitor
-    visitor.close 
+    traverse_ast 
   end
 
   def parse_p(parent_node)
@@ -54,12 +51,12 @@ class Parser
     # 
     input_token
     if token.is_a?TSemicolon
-      parse_x(parent_node)
+      parse_x parent_node
     end
   end
 
   def parse_x(parent_node)
-    parse_p(parent_node) 
+    parse_p parent_node
   end
 
   def parse_a
@@ -80,9 +77,9 @@ class Parser
   end
 
   def parse_d
-    match(TBinOp)
+    match TBinOp
     @node_assignment.op = token
-    match(TNumber)
+    match TNumber
     @node_assignment.op2 = token 
   end
 
@@ -103,6 +100,12 @@ class Parser
 
   def parse_error
     "Syntaxfehler, Token is: #{@token.class}."
+  end
+
+  def traverse_ast
+    visitor = JSVisitor.new
+    @node_start.accept visitor
+    visitor.run
   end
 
 

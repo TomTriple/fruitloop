@@ -1,0 +1,6 @@
+xa := xa + 7;
+xb := xb + 3;
+
+loop xb do
+  xa := xa - 1
+end

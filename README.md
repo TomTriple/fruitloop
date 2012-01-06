@@ -3,9 +3,15 @@ FRUITLOOP
 Implementation of the LOOP programming language which compiles to JavaScript. See: http://de.wikipedia.org/wiki/LOOP-Programm.
 
 
-- Look at 'source.loop' for some example code.
-- Run 'main.rb'. This compiles a loop program to JavaScript which is in turn referenced in 'loop.html'.
-- Open 'loop.html'.
+DEPENDENCIES
+============
+- Ruby >= 1.9.2p290, not tested with other versions
+- Node.js >= 0.5.6
 
+
+HOWTO
+=====
+- Run "ruby main.rb add.loop" to compile and execute "add.loop". The same goes for the other examples. 
+- The result of a computation will always be located in variable "xa". 
 
 

@@ -1,8 +1,8 @@
 class NodeStart < ParentNode
   def accept(visitor)
-    visitor.visitStart self
+    visitor.visit_start self
     stmts.each do |stmt|
-      stmt.accept(visitor)
+      stmt.accept visitor
     end
   end
 end
