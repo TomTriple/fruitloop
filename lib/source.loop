@@ -1,5 +1,0 @@
-xb := null + 2;
-xc := null + 3;
-loop xc do
-    xa := xb + 1
-end

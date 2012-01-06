@@ -1,43 +1,8 @@
-class Node
-  @@target = ""
-
-  def translate(src)
-    @@target += src
-  end
-end
-
-
-class NodeStart < Node
-  attr_accessor :children
-
-  def accept(visitor)
-    visitor.visitStart self
-  end
-end
-
-
-class NodeAssignment < Node
-  attr_accessor :lvalue, :rvalue
-
-  def accept(visitor)
-    visitor.visitAssignment self
-  end
-end
-
-
-class NodeLoop < Node
-  attr_accessor :to, :children
-
-  def accept(visitor)
-    visitor.visitLoop self 
-  end
-end
-
-
-
-
-
-
+require "nodes/node_parent"
+require "nodes/node_assignment"
+require "nodes/node_loop"
+require "nodes/node_start"
+require "gen/jsvisitor"
 
 
 
@@ -56,22 +21,29 @@ class Parser
   end
 
   def parse_start
-    #test_tokens
-    #exit
+   # test_tokens
+   # exit
 
-    parse_p
-    raise parse_error unless token.is_a?TTerminate 
-
+    @node_start = NodeStart.new
+    parse_p(@node_start)
+    raise parse_error unless token.is_a?TTerminate
+    traverse_ast 
   end
 
-  def parse_p
+  def parse_p(parent_node)
     input_token
     if token.is_a?TIdentifier
+      @node_assignment = NodeAssignment.new
+      @node_assignment.lvalue = token
       parse_a
+      parent_node << @node_assignment
     elsif token.is_a?TLoop
+      @node_loop = NodeLoop.new
+      parent_node << @node_loop 
       match TIdentifier
+      @node_loop.to = token
       match TDo
-      parse_p
+      parse_p(@node_loop)
       raise parse_error unless token.is_a?TEnd 
     else
       raise parse_error
@@ -79,12 +51,12 @@ class Parser
     # 
     input_token
     if token.is_a?TSemicolon
-      parse_x
+      parse_x parent_node
     end
   end
 
-  def parse_x
-    parse_p
+  def parse_x(parent_node)
+    parse_p parent_node
   end
 
   def parse_a
@@ -99,12 +71,16 @@ class Parser
 
   def parse_c
     match TIdentifier
+    SymbolTable.identifiers << token 
+    @node_assignment.op1 = token
     parse_d
   end
 
   def parse_d
-    match(TBinOp)
-    match(TNumber)
+    match TBinOp
+    @node_assignment.op = token
+    match TNumber
+    @node_assignment.op2 = token 
   end
 
 
@@ -124,6 +100,12 @@ class Parser
 
   def parse_error
     "Syntaxfehler, Token is: #{@token.class}."
+  end
+
+  def traverse_ast
+    visitor = JSVisitor.new
+    @node_start.accept visitor
+    visitor.run
   end
 
 
