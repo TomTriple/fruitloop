@@ -17,12 +17,13 @@ class Parser
   def test_tokens
     while @token = @lexer.input_token
       p @token
+      break if @token.is_a?TTerminate 
     end
   end
 
   def parse_start
-   # test_tokens
-   # exit
+    #test_tokens
+    #exit
 
     @node_start = NodeStart.new
     parse_p(@node_start)

@@ -3,6 +3,8 @@ require "token/all"
 
 class Lexer
 
+  attr_accessor :lexem, :char, :state
+
   def initialize 
     @source = ""
     read_input(ARGV.first)
@@ -10,82 +12,76 @@ class Lexer
   end
 
 
-  def start
-    puts "starting lexer..."
-    while @next_token = next_token
-      puts "t #{@next_token}"
-    end
-  end
-
-
   def input_token
 
-    @token_name = ""
-    while (@c = next_char) && @input_finished.nil? 
-      next if whitespace?
+    self.state = :start
+    next_char
 
-      # TIdentifer + Keywords
-      if @c =~ /[a-z]/
-        @token_name = @c
-        while (@c = next_char) =~ /[a-z]/
-          @token_name += @c
-        end
-        @pos -= 1
-        if @token_name == "loop"
-          return TLoop.new
-        elsif @token_name == "do"
-          return TDo.new
-        elsif @token_name == "end"
-          return TEnd.new 
-        else
-          return TIdentifier.new(@token_name)
-        end
+    while true
+
+      # puts "state: #{state}, char: #{char}, lexem: #{lexem}"
+
+      case state
+        when :start then
+          case char
+            when ":" then self.state = :colon
+            when "=" then self.state = :eq
+            when /[+|-]/ then self.state = :binop
+            when ";" then self.state = :semicolon
+            when "EOF" then self.state = :terminate
+            when /[a-z]/ then
+              self.lexem = char
+              self.state = :identifier_start
+            when /[0-9]/ then
+              self.lexem = char
+              self.state = :number_start
+            else next_char
+          end
+        when :colon then return TColon.new
+        when :eq then return TEq.new
+        when :binop then return TBinOp.new(char)
+        when :semicolon then return TSemicolon.new
+        when :identifier_start then
+          if next_char =~ /[a-z]/ 
+            self.lexem += char
+          else
+            self.state = :identifier
+            @pos -= 1
+          end
+        when :identifier then
+            l = get_and_clear_lexem
+            return case l
+              when "loop" then TLoop.new
+              when "do" then TDo.new
+              when "end" then TEnd.new
+              else TIdentifier.new(l)
+            end
+        when :number_start then
+          if next_char =~ /[0-9]/ then
+            self.lexem += char
+          else
+            @pos -= 1
+            self.state = :number 
+          end
+        when :number then
+          l = get_and_clear_lexem
+          return TNumber.new(l)
+        when :terminate then return TTerminate.new
       end
-
-      # TNumber
-      if @c =~ /[0-9]/
-        @token_name = @c
-        while (@c = next_char) =~ /[0-9]/
-          @token_name += @c
-        end
-        @pos -= 1
-        return TNumber.new(@token_name)
-      end
-
-      # TColon
-      if @c == ":"
-        return TColon.new
-      end
-
-      # TEq
-      if @c == "="
-        return TEq.new
-      end
-
-      # TBinOp
-      if @c == "+" || @c == "-"
-        return TBinOp.new(@c)
-      end
-
-      # TSemicolon 
-      if @c == ";"
-        return TSemicolon.new
-      end
-
-      # TEnd 
-      if @c == "@"
-        @input_finished = true
-        return TTerminate.new
-      end 
     end
   end
 
 
   private
 
-  def whitespace?
-    @c == "\t" or @c == "\n" or @c == "\r" or @c == " "
+  def get_and_clear_lexem
+    lex = self.lexem 
+    self.lexem = ""
+    lex 
   end
+
+
+  def char; return @c; end;
 
 
   def read_input(file)
@@ -101,12 +97,12 @@ class Lexer
   def next_char
     if @pos <= @source.length-1
       @pos += 1
-      c = @source.slice(@pos, 1)
+      @c = @source.slice(@pos, 1)
       #puts "char: #{c}"
-      c
     else
-      "@"
+      @c = "EOF"
     end
+    @c 
   end
 
 end
