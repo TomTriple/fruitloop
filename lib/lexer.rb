@@ -11,7 +11,7 @@ class Lexer
     @pos = -1
   end
 
-
+  
   def input_token
 
     self.state = :start

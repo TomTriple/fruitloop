@@ -1,15 +1,8 @@
 a := a + 3;
 a := a + 3;
 
+
 loop a do
-  xa := xa + 2;
-  xb := xb + 1;
-  loop c do
-    loop b do
-      c := c + 3
-    end
-  end;
-  loop z do
-    p := a + 3
-  end
+  b := b + 1;
+  b := b + 1
 end

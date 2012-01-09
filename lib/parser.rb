@@ -62,7 +62,7 @@ class Parser
       when TTerminate, TEnd, TSemicolon then # ... auch auf follow-menge "predicten".
         # Epsilon-Produktion 
       else
-        parse_error # fehler - da aktueller token weder in first(x) noch follow(x) 
+        parse_error # fehler - da aktueller token weder in 1. first(x) 2. follow(x) falls Eps. in first(x)
     end
   end
 
@@ -117,7 +117,7 @@ class Parser
     if lookahead.is_a?(which_class)
       p "Is: #{lookahead.class}, Expected: #{which_class}"
     else
-      p "Parsing-Fehler. Is: #{lookahead.class}, Expected: #{which_class}"
+      p "Syntaxfehler! Is: #{lookahead.class} Expected: #{which_class}" 
       exit
     end
     consume_token
@@ -129,7 +129,7 @@ class Parser
   end
 
   def parse_error
-    p "Syntaxfehler, Token is: #{lookahead.class}."
+    p "Syntaxfehler bei Token: #{lookahead.class}"
     exit 
   end
 

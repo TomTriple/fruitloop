@@ -1,4 +1,6 @@
-class Token; end;
+class Token
+  attr_accessor :line, :row 
+end
 
 class TIdentifier < Token
   attr_accessor :name
