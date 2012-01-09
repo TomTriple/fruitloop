@@ -8,7 +8,7 @@ require "gen/jsvisitor"
 
 class Parser
 
-  attr_reader :token 
+  attr_reader :lookahead
 
   def initialize(lexer)
     @lexer = lexer
@@ -21,92 +21,122 @@ class Parser
     end
   end
 
+
   def parse_start
-    #test_tokens
-    #exit
-
-    @node_start = NodeStart.new
-    parse_p(@node_start)
-    raise parse_error unless token.is_a?TTerminate
-    traverse_ast 
-  end
-
-  def parse_p(parent_node)
-    input_token
-    if token.is_a?TIdentifier
-      @node_assignment = NodeAssignment.new
-      @node_assignment.lvalue = token
-      parse_a
-      parent_node << @node_assignment
-    elsif token.is_a?TLoop
-      @node_loop = NodeLoop.new
-      parent_node << @node_loop 
-      match TIdentifier
-      @node_loop.to = token
-      match TDo
-      parse_p(@node_loop)
-      raise parse_error unless token.is_a?TEnd 
-    else
-      raise parse_error
-    end
-    # 
-    input_token
-    if token.is_a?TSemicolon
-      parse_x parent_node
+    consume_token
+    case lookahead 
+      when TIdentifier, TLoop then
+        parse_p
+        match TTerminate 
+      else
+        parse_error
     end
   end
 
-  def parse_x(parent_node)
-    parse_p parent_node
+
+  def parse_p
+    case lookahead
+      when TIdentifier then
+        match TIdentifier
+        parse_a
+        parse_x
+      when TLoop then
+        match TLoop
+        match TIdentifier
+        match TDo
+        parse_p
+        match TEnd
+        parse_x
+      else
+        parse_error
+    end
   end
+
+  # x kann nach Epsilon abgeleitet werden, daher...
+  def parse_x
+    case lookahead
+      when TSemicolon then # ... neben dem fall, dass es nicht Epsilon ist...
+        match TSemicolon
+        parse_p
+        parse_x
+      when TTerminate, TEnd, TSemicolon then # ... auch auf follow-menge "predicten".
+        # Epsilon-Produktion 
+      else
+        parse_error # fehler - da aktueller token weder in first(x) noch follow(x) 
+    end
+  end
+
 
   def parse_a
-    match TColon
-    parse_b
+    case lookahead
+      when TColon then
+        match TColon
+        parse_b
+      else
+        parse_error
+    end
   end
+
 
   def parse_b
-    match TEq
-    parse_c 
+    case lookahead
+      when TEq then
+        match TEq
+        parse_c
+      else
+        parse_error
+    end
   end
+
 
   def parse_c
-    match TIdentifier
-    SymbolTable.identifiers << token 
-    @node_assignment.op1 = token
-    parse_d
+    case lookahead
+      when TIdentifier
+        match TIdentifier
+        parse_d
+      else
+        parse_error
+    end
   end
 
+
   def parse_d
-    match TBinOp
-    @node_assignment.op = token
-    match TNumber
-    @node_assignment.op2 = token 
+    case lookahead
+      when TBinOp then
+        match TBinOp
+        match TNumber
+      else
+        parse_error
+    end
   end
 
 
   private
 
   def match(which_class)
-    @token = @lexer.input_token
-    unless @token.is_a?(which_class)
-      p "Parsing-Fehler. Is: #{@token.class}, Expected: #{which_class}"
+    if lookahead.is_a?(which_class)
+      p "Is: #{lookahead.class}, Expected: #{which_class}"
+    else
+      p "Parsing-Fehler. Is: #{lookahead.class}, Expected: #{which_class}"
       exit
     end
+    consume_token
   end
 
-  def input_token
-    @token = @lexer.input_token 
+  def consume_token
+    @lookahead = @lexer.input_token 
+    @lookahead 
   end
 
   def parse_error
-    "Syntaxfehler, Token is: #{@token.class}."
+    p "Syntaxfehler, Token is: #{lookahead.class}."
+    exit 
   end
 
   def traverse_ast
-    visitor = JSVisitor.new
-    @node_start.accept visitor
-    visitor.run
+    #visitor = JSVisitor.new
+    #@node_start.accept visitor
+    #visitor.run
   end
 
 

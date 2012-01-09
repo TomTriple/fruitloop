@@ -28,7 +28,7 @@ class Lexer
             when "=" then self.state = :eq
             when /[+|-]/ then self.state = :binop
             when ";" then self.state = :semicolon
-            when "EOF" then self.state = :terminate
+            when "@" then self.state = :terminate
             when /[a-z]/ then
               self.lexem = char
               self.state = :identifier_start
@@ -42,7 +42,7 @@ class Lexer
         when :binop then return TBinOp.new(char)
         when :semicolon then return TSemicolon.new
         when :identifier_start then
-          if next_char =~ /[a-z]/ 
+          if next_char =~ /[a-z]/
             self.lexem += char
           else
             self.state = :identifier
@@ -80,9 +80,7 @@ class Lexer
     lex 
   end
 
-
   def char; return @c; end;
-
 
   def read_input(file)
     open(file) do |f|
@@ -93,14 +91,13 @@ class Lexer
     @source += " "
   end
 
-
   def next_char
     if @pos <= @source.length-1
       @pos += 1
       @c = @source.slice(@pos, 1)
       #puts "char: #{c}"
     else
-      @c = "EOF"
+      @c = "@"
     end
     @c 
   end
