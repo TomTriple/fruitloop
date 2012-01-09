@@ -8,7 +8,8 @@ class JSVisitor
   end
 
   def visit_start(node)
-    compile "var sys = require('sys');"
+    compile "sys = require('sys');"
+    compile "xa = 0;"
     SymbolTable.identifiers.each do |token|
       compile "#{token.name} = 0;"
     end

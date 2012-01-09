@@ -26,39 +26,49 @@ class Parser
     consume_token
     case lookahead 
       when TIdentifier, TLoop then
-        parse_p
+        @node_start = NodeStart.new
+        parse_p @node_start
         match TTerminate 
       else
         parse_error
     end
+
+    # syntax was ok... then: 
+    traverse_ast 
   end
 
 
-  def parse_p
+  def parse_p parent_node
     case lookahead
       when TIdentifier then
+        @node_assignment = NodeAssignment.new
+        @node_assignment.lvalue = lookahead
+        parent_node << @node_assignment
         match TIdentifier
         parse_a
-        parse_x
+        parse_x parent_node
       when TLoop then
+        @node_loop = NodeLoop.new
+        parent_node << @node_loop
         match TLoop
+        @node_loop.to = lookahead
         match TIdentifier
         match TDo
-        parse_p
+        parse_p @node_loop 
         match TEnd
-        parse_x
+        parse_x @node_loop
       else
         parse_error
     end
   end
 
   # x kann nach Epsilon abgeleitet werden, daher...
-  def parse_x
+  def parse_x parent_node
     case lookahead
       when TSemicolon then # ... neben dem fall, dass es nicht Epsilon ist...
         match TSemicolon
-        parse_p
-        parse_x
+        parse_p parent_node
+        parse_x parent_node 
       when TTerminate, TEnd, TSemicolon then # ... auch auf follow-menge "predicten".
         # Epsilon-Produktion 
       else
@@ -92,6 +102,8 @@ class Parser
   def parse_c
     case lookahead
       when TIdentifier
+        SymbolTable.identifiers << lookahead
+        @node_assignment.op1 = lookahead
         match TIdentifier
         parse_d
       else
@@ -103,7 +115,9 @@ class Parser
   def parse_d
     case lookahead
       when TBinOp then
+        @node_assignment.op = lookahead
         match TBinOp
+        @node_assignment.op2 = lookahead 
         match TNumber
       else
         parse_error
@@ -115,7 +129,7 @@ class Parser
 
   def match(which_class)
     if lookahead.is_a?(which_class)
-      p "Is: #{lookahead.class}, Expected: #{which_class}"
+      #p "Is: #{lookahead.class}, Expected: #{which_class}"
     else
       p "Syntaxfehler! Is: #{lookahead.class} Expected: #{which_class}" 
       exit
@@ -134,9 +148,9 @@ class Parser
   end
 
   def traverse_ast
-    #visitor = JSVisitor.new
-    #@node_start.accept visitor
-    #visitor.run
+    visitor = JSVisitor.new
+    @node_start.accept visitor
+    visitor.run
   end
 
 

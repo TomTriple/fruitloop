@@ -1,8 +1,6 @@
-a := a + 3;
-a := a + 3;
+xa := xa + 4;
+xb := xb + 3;
 
-
-loop a do
-  b := b + 1;
-  b := b + 1
+loop xb do
+  xa := xa + 1
 end
