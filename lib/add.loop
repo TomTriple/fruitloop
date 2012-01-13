@@ -1,6 +1,16 @@
-xa := xa + 4;
-xb := xb + 3;
+xa := 4; 
+xb := 2;
 
 loop xb do
   xa := xa + 1
+end; 
+
+
+xa := xa + 1; 
+
+b := 3;
+loop b do
+  b := b + 12;
+  xa := xa + 1
 end
+

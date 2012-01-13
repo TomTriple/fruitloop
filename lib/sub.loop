@@ -1,5 +1,5 @@
 xa := xa + 7;
-xb := xb + 3;
+xb := xb + 1;
 
 loop xb do
   xa := xa - 1

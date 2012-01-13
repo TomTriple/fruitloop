@@ -1,6 +1,8 @@
 require "token/all"
 
 
+# Scanner-Komponente
+# Liefert bei einem Aufruf von "input_token" immer das nächste Token im Quellprogramm. 
 class Lexer
 
   attr_accessor :lexem, :char, :state
@@ -11,7 +13,8 @@ class Lexer
     @pos = -1
   end
 
-  
+
+  # Gibt das nächste Token der Eingabe zurück
   def input_token
 
     self.state = :start
@@ -74,28 +77,24 @@ class Lexer
 
   private
 
+  # Gibt das aktuelle Lexem zurück. Löscht zusätzlich die Instanzvariable.
   def get_and_clear_lexem
     lex = self.lexem 
     self.lexem = ""
     lex 
   end
 
-  def char; return @c; end;
+  # Reader-Methode die das aktuelle Zeichen liefert
+  def char; @c; end;
 
-  def read_input(file)
-    open(file) do |f|
-      f.each_line do |line|
-        @source += line
-      end
-    end
-    @source += " "
-  end
+  # Liest den Quellcode
+  def read_input(file); @source = open(file).read; end;
 
+  # Liefert das nächste Zeichen der Eingabe
   def next_char
     if @pos <= @source.length-1
       @pos += 1
       @c = @source.slice(@pos, 1)
-      #puts "char: #{c}"
     else
       @c = "@"
     end

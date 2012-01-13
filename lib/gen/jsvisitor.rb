@@ -10,13 +10,18 @@ class JSVisitor
   def visit_start(node)
     compile "sys = require('sys');"
     compile "xa = 0;"
-    SymbolTable.identifiers.each do |token|
-      compile "#{token.name} = 0;"
+    compile "/* adding null initializers */"
+    SymbolTable.null_initializers.each do |token|
+      compile "#{token.name} = 0;" 
     end
   end
 
   def visit_assignment(node)
-    compile "#{node.lvalue.name} = #{node.op1.name} #{node.op.op} #{node.op2.number}; "
+    if node.rvalue
+      compile "#{node.lvalue.name} = #{node.rvalue.number};"
+    else
+      compile "#{node.lvalue.name} = #{node.op1.name} #{node.op.op} #{node.op2.number}; "
+    end
   end
 
   def visit_loop_start(node)
@@ -30,11 +35,12 @@ class JSVisitor
   end
 
   def run
-    compile "sys.puts(\"xa = \" + xa);" 
+    compile "sys.puts(\"xa: \" + xa);"
     nodejs = IO.popen("/usr/local/bin/node", "r+")
+    p @target 
     nodejs.puts @target
     nodejs.close_write
-    puts nodejs.gets 
+    puts nodejs.gets
   end
 
 

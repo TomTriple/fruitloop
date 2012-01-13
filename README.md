@@ -19,10 +19,11 @@ GRAMMAR
 =======
 S ::= P$
 P ::= id A X
-    | loop id do P end X
+    | loop id do P end X 
 A ::= : B
 B ::= = C
 C ::= id D
+    | number
 D ::= + number
     | - number
 X ::= ; P X | Epsilon
