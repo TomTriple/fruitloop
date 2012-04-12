@@ -1,10 +1,9 @@
 a := a + 5;
-b := b + 4;
+b := b + 8;
 
 loop a do
   loop b do
     xa := xa + 1
   end
 end
-
 

@@ -37,7 +37,6 @@ class JSVisitor
   def run
     compile "sys.puts(\"xa: \" + xa);"
     nodejs = IO.popen("/usr/local/bin/node", "r+")
-    p @target 
     nodejs.puts @target
     nodejs.close_write
     puts nodejs.gets

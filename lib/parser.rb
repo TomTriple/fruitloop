@@ -21,19 +21,19 @@ class Parser
     end
   end
 
-  # Parse-Methode für die Startproduktion
+  # Parsing method for the start production
   def parse_start
     consume_token
     case lookahead 
       when TIdentifier, TLoop then
-        @node_start = NodeStart.new # Startknoten des AST
+        @node_start = NodeStart.new # The AST´s root node
         parse_p @node_start
         match TTerminate 
       else
         parse_error
     end
 
-    # Nachdem die Syntax OK ist den AST traversieren
+    # Evaluate AST after the syntax is good
     traverse_ast 
   end
 
@@ -44,13 +44,13 @@ class Parser
         @node_assignment = NodeAssignment.new
         @node_assignment.lvalue = lookahead
         SymbolTable.add_id lookahead 
-        parent_node << @node_assignment # Zuweisungsknoten
+        parent_node << @node_assignment # Assignment node
         match TIdentifier
         parse_a
         parse_x parent_node
       when TLoop then
         @node_loop = NodeLoop.new
-        parent_node << @node_loop # Loopknoten
+        parent_node << @node_loop # Loop node
         match TLoop
         to = lookahead
         semantic_error "loop variable must be defined" unless SymbolTable.get_id(to) 
@@ -66,19 +66,19 @@ class Parser
   end
 
 
-  # x kann nach Epsilon abgeleitet werden, daher...
+  # As x can evaluate to Epsilon...
   def parse_x parent_node
     case lookahead
-      when TSemicolon then # ... neben dem Fall, dass es nicht Epsilon ist...
+      when TSemicolon then # ... besides the case that it is not Epsilon ...
         match TSemicolon
         parse_p parent_node
         parse_x parent_node 
-      when TTerminate, TEnd, TSemicolon then # ... auch auf Follow-Menge "predicten".
-        # Epsilon-Produktion 
+      when TTerminate, TEnd, TSemicolon then # ... predict for the follow set.
+        # Epsilon production
       else
-      # Fehler - da aktueller Lookahead weder in
-      # 1. First(x)
-      # 2. Follow(x) falls Epsilon in First(x)
+        # Error - the current lookahead is neither in..
+        # 1. FIRST(x)
+        # 2. FOLLOW(x) if Epsilon in FIRST(x)  
       parse_error 
     end
   end
@@ -110,11 +110,11 @@ class Parser
     case lookahead
       when TIdentifier
         SymbolTable.add_null_initializer lookahead
-        @node_assignment.op1 = lookahead # Erster Operator einer Zuweisung
+        @node_assignment.op1 = lookahead # An assignment´s first operand
         match TIdentifier
         parse_d
       when TNumber
-        @node_assignment.rvalue = lookahead # Kurzzuweisung 
+        @node_assignment.rvalue = lookahead # Short assignment
         match TNumber
       else
         parse_error
@@ -127,7 +127,7 @@ class Parser
       when TBinOp then
         @node_assignment.op = lookahead # Operand
         match TBinOp
-        @node_assignment.op2 = lookahead # Zweiter Operator einer Zuweisung
+        @node_assignment.op2 = lookahead # An assignment´s second operand
         match TNumber
       else
         parse_error
@@ -137,9 +137,9 @@ class Parser
 
   private
 
-  # Prüft ob das aktuelle Token eine Instanz von <which_class> ist, ansonsten
-  # terminiert das Programm da ein Syntaxfehler vorliegt. Liest nach Prüfung das
-  # nächste Token
+  # Checks if the current token is an instance of <which_class>. If this is not the case
+  # the programm terminates as an syntacial error occured. Reads the next token after the
+  # check was successful.
   def match(which_class)
     if lookahead.is_a?(which_class)
       #p "Is: #{lookahead.class}, Expected: #{which_class}"
@@ -150,7 +150,7 @@ class Parser
     consume_token
   end
 
-  # Holt das nächste Token vom Scanner
+  # Returns the next token from the scanner
   def consume_token
     @lookahead = @lexer.input_token 
     @lookahead 

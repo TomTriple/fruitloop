@@ -1,12 +1,12 @@
 FRUITLOOP
 =========
-Implementation of the LOOP programming language which compiles to JavaScript. See: http://de.wikipedia.org/wiki/LOOP-Programm.
+Implementation of the LOOP programming language which compiles to JavaScript. See: http://de.wikipedia.org/wiki/LOOP-Programm. 
 
 
 DEPENDENCIES
 ============
 - Ruby >= 1.9.2p290, not tested with other versions
-- Node.js >= 0.5.6
+- Node.js >= 0.5.6; the binary is expected to be located at /usr/local/bin/node 
 
 
 HOWTO
@@ -17,17 +17,17 @@ HOWTO
 
 GRAMMAR
 =======
-S ::= P$
-P ::= id A X
-    | loop id do P end X 
-A ::= : B
-B ::= = C
-C ::= id D
-    | number
-D ::= + number
-    | - number
-X ::= ; P X | Epsilon
+- S ::= P$
+- P ::= id A X | loop id do P end X
+- A ::= : B
+- B ::= = C
+- C ::= id D | number
+- D ::= + number | - number
+- X ::= ; P X | Epsilon
 
 
+License
+=======
+FRUITLOOP is released under the MIT license: [www.opensource.org/licenses/MIT](www.opensource.org/licenses/MIT) 
 
 
